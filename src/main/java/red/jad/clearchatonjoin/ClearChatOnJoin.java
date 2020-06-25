@@ -5,16 +5,19 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = "clearchatonjoin", useMetadata = true, clientSideOnly = true, serverSideOnly = false)
-@Mod.EventBusSubscriber
 public class ClearChatOnJoin{
 	@EventHandler
-    public void postInit(FMLPostInitializationEvent e){ MinecraftForge.EVENT_BUS.register(this); }
+	public void postInit(FMLPostInitializationEvent e){ if(e.getSide() == Side.CLIENT) MinecraftForge.EVENT_BUS.register(this); }
+	@SubscribeEvent
 	public void onLogin(ClientConnectedToServerEvent e) { MinecraftForge.EVENT_BUS.register(new ChatClearer()); }
 	class ChatClearer {
+		@SubscribeEvent
 		public void onTick(PlayerTickEvent e) {
 			Minecraft.getMinecraft().ingameGUI.getChatGUI().clearChatMessages(false);
 			if(e.player.ticksExisted >= 20) MinecraftForge.EVENT_BUS.unregister(this);
